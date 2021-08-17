@@ -1,0 +1,72 @@
+﻿<%@ Master Language="VB" Inherits="System.Web.Mvc.ViewMasterPage" %>
+<%
+    
+    If Advertisment.LoginUser.Login(Request("AdvUserId")) AndAlso _
+        Not (Request.Url.Segments.Count = 1 OrElse Request.Url.Segments(1) = "Home/") Then
+         
+        If Advertisment.LoginUser.LoggedUser.Type = Advertisment.UserType.AdManager _
+            AndAlso Not Request.Url.Segments.Contains("Advertisement") _
+            AndAlso Not Request.Url.Segments.Contains("Advertisement/")Then
+            Response.Redirect("~/Advertisement", True)
+        ElseIf Advertisment.LoginUser.LoggedUser.Type = Advertisment.UserType.SystemManager _
+            AndAlso Not Request.Url.Segments.Contains("Customer") _
+            AndAlso Not Request.Url.Segments.Contains("Customer/") _
+            AndAlso Not Request.Url.Segments.Contains("User") _
+            AndAlso Not Request.Url.Segments.Contains("User/")Then
+            Response.Redirect("~/Customer", True)
+        End If
+    End If
+    
+%>
+<%-- The following line works around an ASP.NET compiler warning --%>
+<%: ""%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title><asp:ContentPlaceHolder ID="TitleContent" runat="server" /></title>
+    <link href="../../Content/Site.css" rel="stylesheet" type="text/css" />
+    <link href="../../Content/font-awesome-base64.css" rel="stylesheet" type="text/css" />
+    <script src="../../Scripts/jquery-1.4.1.js" type="text/javascript"></script>
+    <script src="../../Scripts/element.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div class="page">
+
+        <div id="header">
+            <div id="title">
+                <h1>Enterprise Advertisement System</h1>
+            </div>
+              
+            <div id="logindisplay">
+                <% Html.RenderPartial("LogOnUserControl")%>                
+            </div> 
+            
+            <div id="menucontainer">
+            
+                <ul id="menu">              
+                    <li><%: Html.ActionLink("Home", "Index", "Home")%></li>
+                    <li><%: Html.ActionLink("About", "About", "Home")%></li>
+                    <%  If Advertisment.LoginUser.LoggedUser IsNot Nothing Then
+                            If Advertisment.LoginUser.LoggedUser.Type = Advertisment.UserType.AdManager Then%>
+                            <li><%: Html.ActionLink("Advertisements", "Index", "Advertisement")%></li>
+                            <%Else%>
+                            <li><%: Html.ActionLink("Customers", "Index", "Customer")%></li>
+                            <li><%: Html.ActionLink("Users", "Index", "User")%></li>
+                    <%  End If
+                    End If%>
+                </ul>
+            
+            </div>
+        </div>
+
+        <div id="main">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+
+            <div id="footer">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
